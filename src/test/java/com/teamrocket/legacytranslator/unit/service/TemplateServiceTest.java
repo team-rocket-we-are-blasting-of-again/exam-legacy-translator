@@ -1,6 +1,6 @@
-package com.teamrocket.Template.unit.service;
+package com.teamrocket.legacytranslator.unit.service;
 
-import com.teamrocket.Template.service.TemplateService;
+import com.teamrocket.legacytranslator.service.TemplateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

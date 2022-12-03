@@ -1,10 +1,10 @@
-package com.teamrocket.Template;
+package com.teamrocket.legacytranslator;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TemplateApplicationTests {
+class LegacyTranslatorApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,4 +1,4 @@
-package com.teamrocket.Template.acceptance;
+package com.teamrocket.legacytranslator.acceptance;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
