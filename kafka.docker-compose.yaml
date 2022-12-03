@@ -26,7 +26,7 @@ services:
       legacy_translator:
   kafka-connect:
     container_name: kafka-connect
-    image: tobiaszimmer/kafka-connect:latest
+    image: tobiaszimmer/exam-prebuilt-images:kafka-connect-19-01-2022-12-03
     ports:
       - "8083:8083"
     depends_on:
