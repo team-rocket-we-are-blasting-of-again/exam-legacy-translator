@@ -1,0 +1,39 @@
+com:
+  teamrocket:
+    kafka:
+      kafka-connect-host: ${KAFKA_CONNECT_HOST:localhost}
+      kafka-connect-port: ${KAFKA_CONNECT_PORT:8083}
+      connectors:
+        jdbc-source-orders:
+          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
+          connection.url: jdbc:postgresql://postgres:5432/food_delivery
+          connection.user: postgres
+          connection.password: Qwerty!234
+          dialect.name: PostgreSqlDatabaseDialect
+          topic.prefix: legacy-orders
+          transform: createKey,setSchema
+          transform.createKey.type: org.apache.kafka.connect.transforms.ValueToKey
+          transform.createKey.fields: id
+          transform.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
+          transform.setSchema.schema.name: OrderRecord
+          poll.interval.ms: 5000
+          mode: incrementing
+          incrementing.column.name: id
+          numeric.precision.mapping: true
+          numeric.mapping: best_fit
+          query: SELECT * FROM (SELECT id, order_date, total_price, delivered_by, customer_id, restaurant_id FROM orders) AS ORDER_DATA
+          table.type: TABLE
+          batch.max.rows: 500
+        jdbc-source-no-orders:
+          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
+          connection.url: jdbc:postgresql://postgres:5432/food_delivery
+          connection.user: postgres
+          connection.password: Qwerty!234
+          table.whitelist: couriers, customers, items, order_items, restaurants, users, roles, users_roles
+          topic.prefix: legacy-
+          poll.interval.ms: 5000
+          mode: bulk
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
