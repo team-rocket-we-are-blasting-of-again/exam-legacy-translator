@@ -10,7 +10,6 @@ services:
     networks:
       legacy_translator:
   kafka:
-    container_name: kafka
     image: bitnami/kafka:latest
     ports:
       - "29092:29092"
@@ -27,7 +26,6 @@ services:
   kafka-connect:
     depends_on:
       - kafka
-    container_name: kafka-connect
     image: tobiaszimmer/exam-prebuilt-images:kafka-connect-16-02-2022-12-04
     command:
       - sh
