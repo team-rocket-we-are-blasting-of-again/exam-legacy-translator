@@ -6,12 +6,13 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: orders
     networks:
       legacy_translator:
   order-service:
     image: tobiaszimmer/exam-order-service:develop-0.0.1-snapshot
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://order-postgres:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-postgres:5432/orders
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       CAMUNDA_BPM_CLIENT_BASE_URL: http://camunda:8080/engine-rest

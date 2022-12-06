@@ -1,3 +1,7 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
 com:
   teamrocket:
     kafka:
@@ -11,11 +15,11 @@ com:
           connection.password: Qwerty!234
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: legacy-orders
-          transform: createKey,setSchema
-          transform.createKey.type: org.apache.kafka.connect.transforms.ValueToKey
-          transform.createKey.fields: id
-          transform.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
-          transform.setSchema.schema.name: OrderRecord
+          transforms: createKey,setSchema
+          transforms.createKey.type: org.apache.kafka.connect.transforms.ValueToKey
+          transforms.createKey.fields: id
+          transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
+          transforms.setSchema.schema.name: OrderRecord
           poll.interval.ms: 5000
           mode: incrementing
           incrementing.column.name: id
@@ -24,7 +28,31 @@ com:
           query: SELECT * FROM (SELECT id, order_date, total_price, delivered_by, customer_id, restaurant_id FROM orders) AS ORDER_DATA
           table.type: TABLE
           batch.max.rows: 500
-        jdbc-source-no-orders:
+        jdbc-sink-orders-order-service:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-orders
+          connection.url: jdbc:postgresql://order-postgres:5432/orders
+          connection.user: postgres
+          connection.password: postgres
+          table.name.format: orders
+          transforms: Flatten, InsertStatus, InsertDelivery, Cast, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.InsertStatus.type: org.apache.kafka.connect.transforms.InsertField$Value
+          transforms.InsertStatus.static.field: status
+          transforms.InsertStatus.static.value: COMPLETED
+          transforms.InsertDelivery.type: org.apache.kafka.connect.transforms.InsertField$Value
+          transforms.InsertDelivery.static.field: with_delivery
+          transforms.InsertDelivery.static.value: true
+          transforms.Cast.type: org.apache.kafka.connect.transforms.Cast$Value
+          transforms.Cast.spec: with_delivery:boolean
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:id,order_date:created_at,total_price:delivery_price,delivered_by:courier_id,customer_id:customer_id,restaurant_id:restaurant_id,status:status,with_delivery:with_delivery
+          insert.mode: upsert
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: id
+        legacy-orders-jdbc-source-no-orders:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
           connection.url: jdbc:postgresql://postgres:5432/food_delivery
           connection.user: postgres
@@ -33,7 +61,3 @@ com:
           topic.prefix: legacy-
           poll.interval.ms: 5000
           mode: bulk
-
-spring:
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
