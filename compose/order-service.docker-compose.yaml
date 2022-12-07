@@ -10,7 +10,7 @@ services:
     networks:
       legacy_translator:
   order-service:
-    image: tobiaszimmer/exam-order-service:develop-0.0.1-snapshot
+    image: tobiaszimmer/exam-order-service:feature-legacy-fields-0.0.1-snapshot
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://order-postgres:5432/orders
       SPRING_DATASOURCE_USERNAME: postgres

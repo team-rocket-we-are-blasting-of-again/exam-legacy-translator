@@ -28,7 +28,16 @@ com:
           query: SELECT * FROM (SELECT id, order_date, total_price, delivered_by, customer_id, restaurant_id FROM orders) AS ORDER_DATA
           table.type: TABLE
           batch.max.rows: 500
-        jdbc-sink-orders-order-service:
+        jdbc-source-no-orders:
+          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
+          connection.url: jdbc:postgresql://postgres:5432/food_delivery
+          connection.user: postgres
+          connection.password: Qwerty!234
+          table.whitelist: couriers, customers, items, order_items, restaurants, users, roles, users_roles
+          topic.prefix: legacy-
+          poll.interval.ms: 100000
+          mode: bulk
+        jdbc-sink-orders-order-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-orders
           connection.url: jdbc:postgresql://order-postgres:5432/orders
@@ -47,17 +56,65 @@ com:
           transforms.Cast.type: org.apache.kafka.connect.transforms.Cast$Value
           transforms.Cast.spec: with_delivery:boolean
           transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
-          transforms.RenameFields.renames: id:id,order_date:created_at,total_price:delivery_price,delivered_by:courier_id,customer_id:customer_id,restaurant_id:restaurant_id,status:status,with_delivery:with_delivery
+          transforms.RenameFields.renames: id:legacy_id,order_date:created_at,total_price:delivery_price,delivered_by:legacy_courier_id,customer_id:legacy_customer_id,restaurant_id:legacy_restaurant_id,status:status,with_delivery:with_delivery
+          insert.mode: upsert
+          batch.size: 5
+          pk.mode: record_value
+          pk.fields: legacy_id
+        jdbc-sink-orders-restaurant-db:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-orders
+          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
+          connection.user: postgres
+          connection.password: Qwerty!234
+          table.name.format: restaurant_orders
+          transforms: Flatten, InsertStatus, InsertDelivery, Cast, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.InsertStatus.type: org.apache.kafka.connect.transforms.InsertField$Value
+          transforms.InsertStatus.static.field: status
+          transforms.InsertStatus.static.value: COMPLETED
+          transforms.InsertDelivery.type: org.apache.kafka.connect.transforms.InsertField$Value
+          transforms.InsertDelivery.static.field: with_delivery
+          transforms.InsertDelivery.static.value: true
+          transforms.Cast.type: org.apache.kafka.connect.transforms.Cast$Value
+          transforms.Cast.spec: with_delivery:boolean
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:legacy_id,order_date:created_at,total_price:total_price,restaurant_id:legacy_restaurant_id,status:status,with_delivery:with_delivery
+          transforms.RenameFields.exclude: customer_id,delivered_by
+          insert.mode: upsert
+          batch.size: 5
+          pk.mode: record_value
+          pk.fields: legacy_id
+        jdbc-sink-order-items-order-db:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-order_items
+          connection.url: jdbc:postgresql://order-postgres:5432/orders
+          connection.user: postgres
+          connection.password: postgres
+          table.name.format: order_item
+          transforms: Flatten, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: order_id:legacy_order_id,quantity:amount,item_id:legacy_menu_item_id
           insert.mode: upsert
           batch.size: 500
           pk.mode: record_value
-          pk.fields: id
-        legacy-orders-jdbc-source-no-orders:
-          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://postgres:5432/food_delivery
+          pk.fields: legacy_order_id,legacy_menu_item_id
+        jdbc-sink-order-items-restaurant-db:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-order_items
+          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
           connection.user: postgres
           connection.password: Qwerty!234
-          table.whitelist: couriers, customers, items, order_items, restaurants, users, roles, users_roles
-          topic.prefix: legacy-
-          poll.interval.ms: 5000
-          mode: bulk
+          table.name.format: order_item
+          transforms: Flatten, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: order_id:legacy_order_id,quantity:quantity,item_id:legacy_menu_item_id
+          insert.mode: upsert
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: legacy_order_id,legacy_menu_item_id

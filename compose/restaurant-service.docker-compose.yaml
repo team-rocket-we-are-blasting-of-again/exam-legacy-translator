@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  restaurant-postgres:
+    image: postgres:14.1-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Qwerty!234
+      - POSTGRES_DB=restaurants
+    networks:
+      legacy_translator:
+  restaurant-service:
+    depends_on:
+      - auth-service
+      - restaurant-postgres
+    image: tobiaszimmer/exam-restaurant-service:feature-legacy-fields-0.0.3-snapshot
+    environment:
+      RESTAURANT_SERVICE_DB: jdbc:postgresql://restaurant-postgres:5432/restaurants
+      RESTAURANT_DB_USER: postgres
+      RESTAURANT_DB_PASSWORD: Qwerty!234
+      CASE_MANAGEMENT_CAMUNDA_BASE_URL: http://camunda:8080/engine-rest
+      KAFKA_BOOTSTRAP_SERVER: kafka:29092
+      AUTH_GRPC_HOST: auth-service
+      AUTH_GRPC_PORT: 50051
+    networks:
+      legacy_translator:
+
+networks:
+  legacy_translator:
+    external: true
+
+
