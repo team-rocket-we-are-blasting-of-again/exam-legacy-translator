@@ -102,19 +102,35 @@ com:
           batch.size: 500
           pk.mode: record_value
           pk.fields: legacy_order_id,legacy_menu_item_id
+        jdbc-sink-items-restaurant-db:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-items
+          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
+          connection.user: postgres
+          connection.password: Qwerty!234
+          table.name.format: items
+          transforms: Flatten, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:legacy_id,category:category,description:description,name:name,price:price,restaurant_id:legacy_restaurant_id
+          insert.mode: upsert
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: legacy_order_id,legacy_item_id
         jdbc-sink-order-items-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-order_items
           connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
           connection.user: postgres
           connection.password: Qwerty!234
-          table.name.format: order_item
+          table.name.format: legacy_order_items
           transforms: Flatten, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
           transforms.Flatten.delimiter: _
           transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
-          transforms.RenameFields.renames: order_id:legacy_order_id,quantity:quantity,item_id:legacy_menu_item_id
+          transforms.RenameFields.renames: order_id:legacy_order_id,quantity:legacy_quantity,item_id:legacy_item_id
           insert.mode: upsert
           batch.size: 500
           pk.mode: record_value
-          pk.fields: legacy_order_id,legacy_menu_item_id
+          pk.fields: legacy_order_id,legacy_item_id
