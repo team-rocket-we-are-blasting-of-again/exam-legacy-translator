@@ -117,7 +117,7 @@ com:
           insert.mode: upsert
           batch.size: 500
           pk.mode: record_value
-          pk.fields: legacy_order_id,legacy_item_id
+          pk.fields: legacy_id
         jdbc-sink-order-items-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-order_items
@@ -134,3 +134,24 @@ com:
           batch.size: 500
           pk.mode: record_value
           pk.fields: legacy_order_id,legacy_item_id
+        jdbc-sink-order-restaurants-restaurant-db:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: legacy-restaurants
+          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
+          connection.user: postgres
+          connection.password: Qwerty!234
+          table.name.format: restaurants
+          transforms: Flatten, InsertArchived, Cast, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.InsertArchived.type: org.apache.kafka.connect.transforms.InsertField$Value
+          transforms.InsertArchived.static.field: archived
+          transforms.InsertArchived.static.value: false
+          transforms.Cast.type: org.apache.kafka.connect.transforms.Cast$Value
+          transforms.Cast.spec: archived:boolean
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:legacy_id,restaurant_name:restaurant_name,user_id:legacy_user_id,archived:archived
+          insert.mode: upsert
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: legacy_id
