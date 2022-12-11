@@ -11,9 +11,9 @@ com:
         # Source legacy restaurants
         jdbc-source-legacy-restaurants:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://postgres:5432/food_delivery
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${LEGACY_DB_URL:jdbc:postgresql://postgres:5432/food_delivery}
+          connection.user: ${LEGACY_DB_USERNAME:postgres}
+          connection.password: ${LEGACY_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: legacy-restaurants
           transforms: createKey,setSchema
@@ -33,9 +33,9 @@ com:
         jdbc-sink-order-restaurants-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-restaurants
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: restaurants
           transforms: Flatten, InsertArchived, InsertArea, Cast, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -57,9 +57,9 @@ com:
         # Source the legacy items
         jdbc-source-legacy-items:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://postgres:5432/food_delivery
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${LEGACY_DB_URL:jdbc:postgresql://postgres:5432/food_delivery}
+          connection.user: ${LEGACY_DB_USERNAME:postgres}
+          connection.password: ${LEGACY_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: legacy-items
           transforms: createKey,setSchema
@@ -79,9 +79,9 @@ com:
         jdbc-sink-items-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-items
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: items
           transforms: Flatten, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -95,9 +95,9 @@ com:
         # Source the restaurant id and matching item id from the newly inserted data
         jdbc-source-restaurants-id-mapping:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: restaurants-id-mapping
           transforms: createKey,setSchema
@@ -117,9 +117,9 @@ com:
         jdbc-sink-ids-from-restaurant-mapping-to-items:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: restaurants-id-mapping
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: items
           transforms: Flatten, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -133,9 +133,9 @@ com:
         # Source legacy orders
         jdbc-source-legacy-orders:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://postgres:5432/food_delivery
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${LEGACY_DB_URL:jdbc:postgresql://postgres:5432/food_delivery}
+          connection.user: ${LEGACY_DB_USERNAME:postgres}
+          connection.password: ${LEGACY_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: legacy-orders
           transforms: createKey,setSchema
@@ -155,9 +155,9 @@ com:
         jdbc-sink-orders-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-orders
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: restaurant_orders
           transforms: Flatten, InsertStatus, InsertDelivery, Cast, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -180,9 +180,9 @@ com:
         # Source legacy order_items
         jdbc-source-legacy-order-items:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://postgres:5432/food_delivery
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${LEGACY_DB_URL:jdbc:postgresql://postgres:5432/food_delivery}
+          connection.user: ${LEGACY_DB_USERNAME:postgres}
+          connection.password: ${LEGACY_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: legacy-order-items
           transforms: setSchema
@@ -198,9 +198,9 @@ com:
         jdbc-sink-order-items-restaurant-db:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: legacy-order-items
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: legacy_order_items
           transforms: Flatten, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -216,9 +216,9 @@ com:
         # Source that gives us order_id, item_id and quantity from the legacy_order_id and legacy_item_id
         jdbc-source-order-items-id-mapping:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           dialect.name: PostgreSqlDatabaseDialect
           topic.prefix: order-items-id-mapping
           transforms: setSchema
@@ -235,9 +235,9 @@ com:
         jdbc-sink-correct-order-items-mapping:
           connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
           topics: order-items-id-mapping
-          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-          connection.user: postgres
-          connection.password: Qwerty!234
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
           table.name.format: order_items
           transforms: Flatten, RenameFields
           transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
@@ -250,9 +250,9 @@ com:
           pk.fields: order_id,item_id
 #        jdbc-source-orders-id-mapping:
 #          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-#          connection.url: jdbc:postgresql://restaurant-postgres:5432/restaurants
-#          connection.user: postgres
-#          connection.password: Qwerty!234
+#          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+#          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+#          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
 #          dialect.name: PostgreSqlDatabaseDialect
 #          topic.prefix: orders-id-mapping
 #          transforms: createKey,setSchema
