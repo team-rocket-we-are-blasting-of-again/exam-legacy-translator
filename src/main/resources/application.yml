@@ -131,7 +131,7 @@ com:
           pk.mode: record_value
           pk.fields: id
         # Source legacy orders
-        jdbc-source-orders:
+        jdbc-source-legacy-orders:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
           connection.url: jdbc:postgresql://postgres:5432/food_delivery
           connection.user: postgres
