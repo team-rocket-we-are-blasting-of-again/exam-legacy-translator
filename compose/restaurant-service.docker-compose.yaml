@@ -11,7 +11,6 @@ services:
       legacy_translator:
   restaurant-service:
     depends_on:
-      - auth-service
       - restaurant-postgres
     image: tobiaszimmer/exam-restaurant-service:feature-legacy-fields-0.0.3-snapshot
     environment:
