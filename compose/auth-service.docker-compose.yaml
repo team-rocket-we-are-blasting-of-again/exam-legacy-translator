@@ -12,7 +12,7 @@ services:
   auth-service:
     depends_on:
       - auth-postgres
-    image: tobiaszimmer/auth
+    image: tobiaszimmer/exam_auth_service:main-0.1.0
     environment:
       POSTGRES_HOST: auth-postgres
       POSTGRES_USER: postgres
