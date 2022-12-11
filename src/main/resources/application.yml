@@ -21,7 +21,7 @@ com:
           transforms.createKey.fields: id
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: OrderRecord
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: incrementing
           incrementing.column.name: id
           numeric.precision.mapping: true
@@ -67,7 +67,7 @@ com:
           transforms.createKey.fields: id
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: LegacyItemRecord
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: incrementing
           incrementing.column.name: id
           numeric.precision.mapping: true
@@ -105,7 +105,7 @@ com:
           transforms.createKey.fields: id
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: OrderRecord
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: incrementing
           incrementing.column.name: id
           numeric.precision.mapping: true
@@ -152,7 +152,7 @@ com:
           transforms.createKey.fields: id
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: RestaurantIdMapping
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: incrementing
           incrementing.column.name: id
           numeric.precision.mapping: true
@@ -207,7 +207,7 @@ com:
           transforms: setSchema
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: OrderItemsRecord
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: bulk
           numeric.mapping: best_fit
           query: SELECT * FROM (SELECT order_id, quantity, item_id FROM order_items) AS ORDER_ITEMS_DATA
@@ -243,7 +243,7 @@ com:
           transforms: setSchema
           transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
           transforms.setSchema.schema.name: RestaurantIdMapping
-          poll.interval.ms: 5000
+          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
           mode: bulk
           numeric.precision.mapping: true
           numeric.mapping: best_fit
@@ -279,7 +279,7 @@ com:
 #          transforms.createKey.fields: id
 #          transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
 #          transforms.setSchema.schema.name: OrdersIdMapping
-#          poll.interval.ms: 5000
+#          poll.interval.ms: ${POLL_INTERVAL_MS:5000}
 #          mode: incrementing
 #          incrementing.column.name: id
 #          numeric.precision.mapping: true
