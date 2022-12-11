@@ -247,7 +247,7 @@ com:
           mode: bulk
           numeric.precision.mapping: true
           numeric.mapping: best_fit
-          query: SELECT * FROM (SELECT o.id as order_id, i.id as item_id, oi.quantity FROM legacy_order_items oi INNER JOIN items i ON oi.legacy_item_id = i.legacy_id INNER JOIN restaurant_orders o ON oi.legacy_order_id = o.legacy_id WHERE i.legacy_id IS NOT NULL AND o.legacy_id IS NOT NULL) AS RESTAURANT_ID_MAPPING
+          query: SELECT * FROM (SELECT o.id as order_id, i.id as item_id, oi.quantity FROM legacy_order_items oi INNER JOIN items i ON oi.legacy_item_id = i.legacy_id INNER JOIN restaurant_orders o ON oi.legacy_order_id = o.legacy_id WHERE i.legacy_id IS NOT NULL AND o.legacy_id IS NOT NULL) AS ORDER_ITEMS_ID_MAPPING
           table.type: TABLE
           batch.max.rows: 500
         # Sink order_id, item_id and quantity into the restaurant order_items table
