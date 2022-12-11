@@ -92,44 +92,6 @@ com:
           batch.size: 500
           pk.mode: record_value
           pk.fields: legacy_id
-        # Source the restaurant id and matching item id from the newly inserted data
-        jdbc-source-restaurants-id-mapping:
-          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
-          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
-          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
-          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
-          dialect.name: PostgreSqlDatabaseDialect
-          topic.prefix: restaurants-id-mapping
-          transforms: createKey,setSchema
-          transforms.createKey.type: org.apache.kafka.connect.transforms.ValueToKey
-          transforms.createKey.fields: id
-          transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
-          transforms.setSchema.schema.name: RestaurantIdMapping
-          poll.interval.ms: 5000
-          mode: incrementing
-          incrementing.column.name: id
-          numeric.precision.mapping: true
-          numeric.mapping: best_fit
-          query: SELECT * FROM (SELECT r.id, i.id AS item_id FROM restaurants r INNER JOIN items i ON r.legacy_id = i.legacy_restaurant_id WHERE r.legacy_id IS NOT NULL) AS RESTAURANT_ID_MAPPING
-          table.type: TABLE
-          batch.max.rows: 500
-        # Update the restaurant items, to correctly set the referenced restaurant_id column
-        jdbc-sink-ids-from-restaurant-mapping-to-items:
-          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
-          topics: restaurants-id-mapping
-          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
-          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
-          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
-          table.name.format: items
-          transforms: Flatten, RenameFields
-          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
-          transforms.Flatten.delimiter: _
-          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
-          transforms.RenameFields.renames: id:restaurant_id,item_id:id
-          insert.mode: update
-          batch.size: 500
-          pk.mode: record_value
-          pk.fields: id
         # Source legacy orders
         jdbc-source-legacy-orders:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
@@ -177,6 +139,63 @@ com:
           batch.size: 5
           pk.mode: record_value
           pk.fields: legacy_id
+        # Source the restaurant id and matching item id from the newly inserted data
+        jdbc-source-restaurants-id-mapping:
+          connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
+          dialect.name: PostgreSqlDatabaseDialect
+          topic.prefix: restaurants-id-mapping
+          transforms: createKey,setSchema
+          transforms.createKey.type: org.apache.kafka.connect.transforms.ValueToKey
+          transforms.createKey.fields: id
+          transforms.setSchema.type: org.apache.kafka.connect.transforms.SetSchemaMetadata$Value
+          transforms.setSchema.schema.name: RestaurantIdMapping
+          poll.interval.ms: 5000
+          mode: incrementing
+          incrementing.column.name: id
+          numeric.precision.mapping: true
+          numeric.mapping: best_fit
+          query: SELECT * FROM (SELECT r.id, i.id AS item_id, o.id as order_id FROM restaurants r INNER JOIN items i ON r.legacy_id = i.legacy_restaurant_id INNER JOIN restaurant_orders o ON r.legacy_id = o.legacy_restaurant_id WHERE r.legacy_id IS NOT NULL AND o.legacy_restaurant_id IS NOT NULL) AS RESTAURANT_ID_MAPPING
+          table.type: TABLE
+          batch.max.rows: 500
+        # Update the restaurant items, to correctly set the referenced restaurant_id column
+        jdbc-sink-ids-from-restaurant-mapping-to-items:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: restaurants-id-mapping
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
+          table.name.format: items
+          transforms: Flatten, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:restaurant_id,item_id:id
+          fields.whitelist: restaurant_id,id
+          insert.mode: update
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: id
+        # Update the orders restaurant id to be correct
+        jdbc-sink-ids-from-restaurant-mapping-to-orders:
+          connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+          topics: restaurants-id-mapping
+          connection.url: ${RESTAURANT_DB_URL:jdbc:postgresql://restaurant-postgres:5432/restaurants}
+          connection.user: ${RESTAURANT_DB_USERNAME:postgres}
+          connection.password: ${RESTAURANT_DB_PASSWORD:Qwerty!234}
+          table.name.format: restaurant_orders
+          transforms: Flatten, RenameFields
+          transforms.Flatten.type: org.apache.kafka.connect.transforms.Flatten$Value
+          transforms.Flatten.delimiter: _
+          transforms.RenameFields.type: org.apache.kafka.connect.transforms.ReplaceField$Value
+          transforms.RenameFields.renames: id:restaurant_id,order_id:id
+          fields.whitelist: restaurant_id,id
+          insert.mode: update
+          batch.size: 500
+          pk.mode: record_value
+          pk.fields: id
         # Source legacy order_items
         jdbc-source-legacy-order-items:
           connector.class: io.confluent.connect.jdbc.JdbcSourceConnector
