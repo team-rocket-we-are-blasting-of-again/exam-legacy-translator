@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  customer-postgres:
+    image: postgres:14.1-alpine
+    environment:
+      - POSTGRES_USER=customer
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=customer
+    networks:
+      legacy_translator:
+  customer-service:
+    depends_on:
+      - customer-postgres
+    image: tobiaszimmer/exam-customer-service:feature-legacy-fields-0.0.1-snapshot
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://customer-postgres:5432/customer
+      SPRING_DATASOURCE_USERNAME: customer
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_SHOW_SQL: false
+      CAMUNDA_ENGINE_REST: http://camunda:8080/engine-rest/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_GRPC_URL: static://auth-service:50051
+    networks:
+      legacy_translator:
+
+networks:
+  legacy_translator:
+    external: true
+
+
